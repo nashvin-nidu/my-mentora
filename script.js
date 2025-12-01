@@ -10,6 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const spinner = generateBtn.querySelector('.spinner');
     const responseArea = document.getElementById('responseArea');
     const responseOutput = document.getElementById('responseOutput');
+    const videoPlayer = document.getElementById('videoPlayer');
+    const videoUrlInput = document.getElementById('videoUrlInput');
+    const videoDownloadLink = document.getElementById('videoDownloadLink');
 
     // Generate initial Job ID
     generateJobId();
@@ -109,13 +112,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify(payload)
             });
 
-            const data = await response.json(); // Assuming JSON response, adjust if text
+            const data = await response.json();
             
+            // Update debug info
             responseOutput.textContent = JSON.stringify(data, null, 2);
-            responseArea.classList.remove('hidden');
             
-            // Scroll to response
-            responseArea.scrollIntoView({ behavior: 'smooth' });
+            if (data.url) {
+                // Update video player
+                videoPlayer.src = data.url;
+                videoPlayer.load(); // Ensure video loads
+                
+                // Update URL display
+                videoUrlInput.value = data.url;
+                videoDownloadLink.href = data.url;
+                
+                // Show result
+                responseArea.classList.remove('hidden');
+                
+                // Scroll to result
+                responseArea.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                throw new Error('No video URL in response');
+            }
 
         } catch (error) {
             console.error('Error:', error);
